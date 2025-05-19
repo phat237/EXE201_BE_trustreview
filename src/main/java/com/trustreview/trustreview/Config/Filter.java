@@ -33,11 +33,12 @@ public class Filter extends OncePerRequestFilter {
     private HandlerExceptionResolver resolver;
     // list danh sach api valid
     private final List<String> AUTH_PERMISSION = List.of(
+            "/accounts/login",
+            "/accounts/register",
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/swagger-resources/**",
-            "/websocket/**",
-            "/accounts/login"
+            "/test-conn"
     );
 
     private boolean isPermitted(String uri) {

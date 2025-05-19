@@ -80,11 +80,16 @@
 
 package com.trustreview.trustreview.Service;
 
+import com.trustreview.trustreview.Config.SecurityConfig;
 import com.trustreview.trustreview.Entity.Account;
+import com.trustreview.trustreview.Enums.AccountRoles;
 import com.trustreview.trustreview.Enums.AccountStatus;
 import com.trustreview.trustreview.Model.AccountReponse;
+import com.trustreview.trustreview.Model.ChangePasswordRequest;
 import com.trustreview.trustreview.Model.LoginRequest;
+import com.trustreview.trustreview.Model.RegisterRequest;
 import com.trustreview.trustreview.Repository.AuthenticationRepository;
+import com.trustreview.trustreview.Utils.AccountUtils;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,6 +126,12 @@ public class AuthenticationService implements UserDetailsService {
     @Autowired
     AuthenticationRepository authenticationRepository;
 
+    @Autowired
+    SecurityConfig securityConfig;
+
+    @Autowired
+    AccountUtils accountUtils;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.debug("Loading user by username: {}", username);
@@ -134,45 +145,80 @@ public class AuthenticationService implements UserDetailsService {
 
     public AccountReponse login(LoginRequest loginRequest) {
         try {
-            log.info("Attempting login for user: {}", loginRequest.getUsername());
-            // The AuthenticationManager will be fully resolved here when authenticate() is called
+            if(loginRequest == null || loginRequest.getPassword().isEmpty() || loginRequest.getUsername().isEmpty()){
+                throw new BadCredentialsException("Vui lòng điền đầy đủ thông tin đăng nhập!");
+            }
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginRequest.getUsername(),
                     loginRequest.getPassword()
             ));
-
             Account account = authenticationRepository.findByUsername(loginRequest.getUsername());
-            if (account == null) {
-                log.error("Critical error: Account {} not found after successful authenticationManager.authenticate() call.", loginRequest.getUsername());
-                throw new AuthenticationServiceException("Authentication process error."); // Should not happen
+            if (account == null || !securityConfig.passwordEncoder().matches(loginRequest.getPassword(), account.getPassword())) {
+                throw new BadCredentialsException("Tên đăng nhập hoặc mật khẩu không đúng!");
             }
-
             if(!account.getStatus().equals(AccountStatus.ACTIVE)){
-                log.warn("Login failed: Account for user {} is not active. Status: {}", account.getUsername(), account.getStatus());
-                throw new AuthenticationServiceException("Your account is locked or not active.");
+                throw new AuthenticationServiceException("Tài khoản bạn đã bị khóa!");
             }
 
             AccountReponse accountReponse = new AccountReponse();
-            String token = tokenService.generateToken(account); // Ensure tokenService.generateToken(account) is working
+            String token = tokenService.generateToken(account);
             accountReponse.setUsername(account.getUsername());
             accountReponse.setId(account.getId());
             accountReponse.setDisplayName(account.getDisplayName());
             accountReponse.setEmail(account.getEmail());
             accountReponse.setRole(account.getRole());
             accountReponse.setStatus(account.getStatus());
-            accountReponse.setCreatedAt(LocalDateTime.now()); // Or account.getCreatedAt() depending on desired logic
+            accountReponse.setCreatedAt(LocalDateTime.now());
             accountReponse.setToken(token);
-            log.info("Login successful for user: {}", loginRequest.getUsername());
             return accountReponse;
-        } catch (BadCredentialsException e) {
-            log.warn("Login failed for user {}: Bad credentials", loginRequest.getUsername(), e);
-            throw new BadCredentialsException("Incorrect username or password!");
-        } catch (AuthenticationServiceException e) {
-            log.warn("Login failed for user {}: Account status issue - {}", loginRequest.getUsername(), e.getMessage(), e);
-            throw e; // Re-throw specific service exception
         } catch (AuthenticationException e) {
-            log.warn("Login failed for user {}: AuthenticationException - {}", loginRequest.getUsername(), e.getMessage(), e);
-            throw new BadCredentialsException("Incorrect username or password due to authentication failure!");
+            throw new BadCredentialsException("Tên đăng nhập hoặc mật khẩu không đúng!");
+        }
+    }
+
+    public Account register(RegisterRequest registerRequest) {
+        if (authenticationRepository.findByUsername(registerRequest.getUsername()) != null){
+            throw new BadCredentialsException("Tên đăng nhập bị trùng, vui lòng chọn một tên khác!");
+        }
+        Account account = new Account();
+        account.setUsername(registerRequest.getUsername());
+        account.setDisplayName(registerRequest.getDisplayName());
+        account.setEmail(registerRequest.getEmail());
+        account.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        account.setRole(AccountRoles.USER);
+        account.setStatus(AccountStatus.ACTIVE);
+        account.setCreatedAt(LocalDateTime.now());
+        return authenticationRepository.save(account);
+    }
+
+    public String updateDisplayName(Long id, String displaynameRequest) {
+        Account account = authenticationRepository.findAccountById(id);
+        if (account != null){
+            account.setDisplayName(displaynameRequest);
+            authenticationRepository.save(account);
+            return "Đã cập nhật tên hiển thị thành " + displaynameRequest + "!";
+        } else {
+            return "Cập nhật tên hiển thị không thành công!";
+        }
+    }
+
+    public String changePassword(ChangePasswordRequest changePasswordRequest) {
+        Account account = authenticationRepository.findAccountById(accountUtils.getAccountCurrent().getId());
+        if (securityConfig.passwordEncoder().matches(changePasswordRequest.getOldPassword(), account.getPassword())) {
+            account.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+            authenticationRepository.save(account);
+            return "Thay đổi mật khẩu thành công!";
+        } else {
+            return "Có lỗi xảy ra, thay đổi mật khẩu thất bại!";
+        }
+    }
+
+    public String deleteAccountById(long id) {
+        if (authenticationRepository.findAccountById(id) != null){
+            authenticationRepository.deleteById(id);
+            return "Đã xóa tài khoản thành công!";
+        } else {
+            return "Có lỗi xảy ra, xóa tài khoản không thành công!";
         }
     }
 }

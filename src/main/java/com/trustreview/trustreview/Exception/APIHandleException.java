@@ -26,5 +26,14 @@ public class APIHandleException {
 //        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 //    }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Object> handleInvalidUserNamePassword(BadCredentialsException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    }
+
+    @ExceptionHandler(AuthenticationServiceException.class)
+    public ResponseEntity<String> handleAuthenticationServiceException(AuthenticationServiceException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    }
 
 }
