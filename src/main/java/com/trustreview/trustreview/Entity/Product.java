@@ -1,6 +1,7 @@
 package com.trustreview.trustreview.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.trustreview.trustreview.Enums.ProductCategory;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,10 +29,8 @@ public class Product {
     @Column(nullable = false)
     private String sourceUrl;
 
-    @ManyToOne
-    @JoinColumn(name="category_id", nullable = false)
-    @JsonIgnore
-    Category categoryProduct;
+    @Enumerated(EnumType.STRING)
+    private ProductCategory category;
 
     @OneToMany(mappedBy = "productReview", cascade = CascadeType.ALL)
     @JsonIgnore

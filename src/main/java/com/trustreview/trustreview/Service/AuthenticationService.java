@@ -1,83 +1,3 @@
-//package com.trustreview.trustreview.Service;
-//
-//import com.trustreview.trustreview.Config.SecurityConfig;
-//import com.trustreview.trustreview.Entity.Account;
-//import com.trustreview.trustreview.Enums.AccountStatus;
-//import com.trustreview.trustreview.Model.AccountReponse;
-//import com.trustreview.trustreview.Model.LoginRequest;
-//import com.trustreview.trustreview.Repository.AuthenticationRepository;
-//import jakarta.transaction.Transactional;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.context.annotation.Lazy;
-//import org.springframework.security.authentication.AuthenticationManager;
-//import org.springframework.security.authentication.AuthenticationServiceException;
-//import org.springframework.security.authentication.BadCredentialsException;
-//import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-//import org.springframework.security.core.AuthenticationException;
-//import org.springframework.security.core.userdetails.UserDetails;
-//import org.springframework.security.core.userdetails.UserDetailsService;
-//import org.springframework.security.core.userdetails.UsernameNotFoundException;
-//import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.stereotype.Service;
-//import java.time.LocalDateTime;
-//
-//@Service
-//@Transactional
-//
-//public class AuthenticationService implements UserDetailsService {
-//
-//    private static final Logger log = LoggerFactory.getLogger(AuthenticationService.class);
-//
-//    @Autowired
-//    AuthenticationManager authenticationManager;
-//
-//    @Autowired
-//    PasswordEncoder passwordEncoder;
-//
-//    @Autowired
-//    TokenService tokenService;
-//
-//    @Autowired
-//    AuthenticationRepository authenticationRepository;
-//
-//
-//    @Override
-//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//        return authenticationRepository.findByUsername(username);
-//    }
-//
-//    public AccountReponse login(LoginRequest loginRequest) {
-//        try {
-//            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-//                    loginRequest.getUsername(),
-//                    loginRequest.getPassword()
-//            ));
-//            Account account = authenticationRepository.findByUsername(loginRequest.getUsername());
-//            if (account == null || !securityConfig.passwordEncoder().matches(loginRequest.getPassword(), account.getPassword())) {
-//                throw new BadCredentialsException("Incorrect username or password");
-//            }
-//            if(!account.getStatus().equals(AccountStatus.ACTIVE)){
-//                throw new AuthenticationServiceException("Your account locked!!!");
-//            }
-//            AccountReponse accountReponse = new AccountReponse();
-//            String token = tokenService.generateToken(account);
-//            accountReponse.setUsername(account.getUsername());
-//            accountReponse.setId(account.getId());
-//            accountReponse.setDisplayName(account.getDisplayName());
-//            accountReponse.setEmail(account.getEmail());
-//            accountReponse.setRole(account.getRole());
-//            accountReponse.setStatus(account.getStatus());
-//            accountReponse.setCreatedAt(LocalDateTime.now());
-//            accountReponse.setToken(token);
-//            return accountReponse;
-//        } catch (AuthenticationException e) {
-//            throw new BadCredentialsException("Incorrect username or password!");
-//        }
-//    }
-//}
-
 package com.trustreview.trustreview.Service;
 
 import com.trustreview.trustreview.Config.SecurityConfig;
@@ -108,7 +28,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 @Service
-@Transactional
+//@Transactional
 public class AuthenticationService implements UserDetailsService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthenticationService.class);

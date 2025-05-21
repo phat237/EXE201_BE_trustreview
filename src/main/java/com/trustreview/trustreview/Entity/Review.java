@@ -22,15 +22,16 @@ public class Review {
 
     @Min(1)
     @Max(5)
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private Integer rating;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, columnDefinition = "NVARCHAR(1000)")
     private String content;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private boolean isVerifiedByAI;
 
+    @Column(columnDefinition = "NVARCHAR(1000)")
     private String AIComment;
 
     private String ipAddress;
