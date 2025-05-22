@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+# Giấu file chứa API key
+src/main/resources/application.properties
