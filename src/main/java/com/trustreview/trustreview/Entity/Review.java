@@ -25,13 +25,13 @@ public class Review {
     @Column(nullable = false)
     private Integer rating;
 
-    @Column(nullable = false, columnDefinition = "NVARCHAR(1000)")
+    @Column(nullable = false, length = 1000)
     private String content;
 
     @Column(nullable = false)
     private boolean isVerifiedByAI;
 
-    @Column(columnDefinition = "NVARCHAR(1000)")
+    @Column(length = 1000)
     private String AIComment;
 
     private String ipAddress;

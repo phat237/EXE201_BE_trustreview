@@ -1,6 +1,7 @@
 package com.trustreview.trustreview.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.trustreview.trustreview.Enums.AIAnalysisResultStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,11 +18,9 @@ public class AIAnalysisLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String analysisResult;
+    private AIAnalysisResultStatus analysisResult;
 
     private boolean isSpam;
-
-    private boolean hasRealExperience;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime processedAt;

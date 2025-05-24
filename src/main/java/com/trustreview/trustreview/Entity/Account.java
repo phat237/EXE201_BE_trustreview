@@ -42,6 +42,8 @@ public class Account implements UserDetails {
     @Enumerated(EnumType.STRING)
     private AccountStatus status;
 
+    private LocalDateTime bannedUntil;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
