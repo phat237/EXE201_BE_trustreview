@@ -15,7 +15,6 @@ public class ReviewFeedback {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
     private boolean isHelpful;
 
     @ManyToOne

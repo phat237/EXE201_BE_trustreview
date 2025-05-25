@@ -38,6 +38,8 @@ public class Review {
 
     private String userAgent;
 
+    private boolean isEdited;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -51,9 +53,9 @@ public class Review {
     @JsonIgnore
     Account accountReview;
 
-    @OneToMany(mappedBy = "reviewHistory", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "reviewHistory", cascade = CascadeType.ALL)
     @JsonIgnore
-    Set<ReviewHistory> reviewHistories;
+    ReviewHistory reviewHistories;
 
     @OneToMany(mappedBy = "reviewReport", cascade = CascadeType.ALL)
     @JsonIgnore

@@ -12,7 +12,7 @@ import java.util.*;
 @Service
 public class AIAnalysisService {
 
-    private final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"; // 🔶
+    private final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
 
     @Value("${openai.api.key}")
     private String apiKey;
@@ -55,33 +55,12 @@ public class AIAnalysisService {
         );
 
         Map<String, Object> payload = Map.of(
-                "model", "gpt-4-1106-preview", // 🔶 model của GPT-4.1 mini
+                "model", "gpt-4-1106-preview",
                 "messages", List.of(systemMessage, userMessage),
                 "temperature", 0.3
         );
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
-//        try {
-//            ResponseEntity<Map> response = restTemplate.postForEntity(OPENAI_API_URL, request, Map.class);
-//            Map body = response.getBody();
-//
-//            if (body == null || body.get("choices") == null) {
-//                return new AIResponse("ERROR", "Không có phản hồi từ GPT (choices=null)");
-//            }
-//
-//            Map choices = (Map) ((List) body.get("choices")).get(0);
-//            Map messageResponse = (Map) choices.get("message");
-//            String fullResponse = (String) messageResponse.get("content");
-//
-//            String[] parts = fullResponse.split(" - ", 2);
-//            if (parts.length == 2) {
-//                return new AIResponse(parts[0].trim(), parts[1].trim());
-//            } else {
-//                return new AIResponse("UNKNOWN", fullResponse);
-//            }
-//        } catch (Exception e) {
-//            return new AIResponse("ERROR", "Lỗi khi gọi OpenAI: " + e.getMessage());
-//        }
         try {
             ResponseEntity<Map> response = restTemplate.postForEntity(OPENAI_API_URL, request, Map.class);
             Map body = response.getBody();
@@ -94,7 +73,6 @@ public class AIAnalysisService {
             Map messageResponse = (Map) choices.get("message");
             String fullResponse = (String) messageResponse.get("content");
 
-            // 👇 TÁCH THEO FORMAT: STATUS - ENUM - GIẢI THÍCH
             String[] parts = fullResponse.split(" - ", 3);
             if (parts.length == 3) {
                 String status = parts[0].trim();

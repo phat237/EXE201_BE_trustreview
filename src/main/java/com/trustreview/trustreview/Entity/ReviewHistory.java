@@ -17,13 +17,16 @@ public class ReviewHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = true)
     private String contentOld;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime modifiedAt;
+    @Column(nullable = true)
+    private Integer ratingOld;
 
-    @ManyToOne
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime beforeModifiedAt;
+
+    @OneToOne
     @JoinColumn(name="review_id", nullable = false)
     @JsonIgnore
     Review reviewHistory;
