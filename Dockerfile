@@ -1,14 +1,8 @@
-# Use official OpenJDK image
-FROM openjdk:17-jdk-slim
+FROM maven:3.8.5-openjdk-17 AS build
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Set working directory
-WORKDIR /app
-
-# Copy the jar file
-COPY target/trustreview-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose the port your app runs on
+FROM openjdk:17.0.1-jdk-slim
+COPY --from=build /target/trustreview-0.0.1-SNAPSHOT.jar project.jar
 EXPOSE 8080
-
-# Run the jar file
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "project.jar"]
