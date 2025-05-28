@@ -34,7 +34,8 @@ public class Filter extends OncePerRequestFilter {
     // list danh sach api valid
     private final List<String> AUTH_PERMISSION = List.of(
             "/accounts/login",
-            "/accounts/register",
+            "/accounts/register/partner",
+            "/accounts/register/user",
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/swagger-resources/**",

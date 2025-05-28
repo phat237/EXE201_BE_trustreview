@@ -39,4 +39,8 @@ public class Product {
     @OneToMany(mappedBy = "productAggregatedSource", cascade = CascadeType.ALL)
     @JsonIgnore
     Set<AggregatedSource> aggregatedSources;
+
+    @OneToMany(mappedBy = "productPartnerReport", cascade = CascadeType.ALL)
+    @JsonIgnore
+    Set<PartnerReport> partnerReports;
 }

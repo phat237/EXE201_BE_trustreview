@@ -49,13 +49,13 @@ public class Review {
     Product productReview;
 
     @ManyToOne
-    @JoinColumn(name="account_id", nullable = false)
+    @JoinColumn(name="user_id", nullable = false)
     @JsonIgnore
-    Account accountReview;
+    Users userReview;
 
-    @OneToOne(mappedBy = "reviewHistory", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "reviewHistory", cascade = CascadeType.ALL)
     @JsonIgnore
-    ReviewHistory reviewHistories;
+    Set<ReviewHistory> reviewHistories;
 
     @OneToMany(mappedBy = "reviewReport", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -68,4 +68,8 @@ public class Review {
     @OneToOne(mappedBy = "reviewAIAnalysisLog", cascade = CascadeType.ALL)
     @JsonIgnore
     AIAnalysisLog aiAnalysisLog;
+
+    @OneToOne(mappedBy = "reviewPartnerFeedback", cascade = CascadeType.ALL)
+    @JsonIgnore
+    PartnerFeedback partnerFeedback;
 }

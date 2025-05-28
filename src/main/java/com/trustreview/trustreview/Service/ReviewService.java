@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -48,60 +50,87 @@ public class ReviewService {
 
     public Review addReview(Long productId, HttpServletRequest request, ReviewRequest reviewRequest) {
         Product product = productRepository.findProductById(productId);
-        if (product == null){
-            throw new BadCredentialsException("Đã có sự cố xảy ra, vui lòng thử lại!");
+        if (product == null) {
+            throw new BadCredentialsException("Sản phẩm không tồn tại!");
         }
+
         Account account = accountUtils.getAccountCurrent();
-        if (account.getBannedUntil() != null && account.getBannedUntil().isAfter(LocalDateTime.now())) {
-            throw new BadCredentialsException("Tài khoản bị tạm khóa đến " + account.getBannedUntil());
+
+        if (!(account instanceof Users user)) {
+            throw new BadCredentialsException("Chỉ người dùng mới có thể đánh giá sản phẩm!");
         }
-        Review existingReview = reviewRepository.findByProductReview_IdAndAccountReview_Id(productId, account.getId());
-        if (existingReview != null){
-            throw new BadCredentialsException("Bạn đã đánh giá sản phẩm này rồi!");
+
+        if (user.getBannedUntil() != null && user.getBannedUntil().isAfter(LocalDateTime.now())) {
+            throw new BadCredentialsException("Tài khoản bị tạm khóa đến " + user.getBannedUntil());
         }
+
+//        if (reviewRepository.findByProductReview_IdAndUserReview_Id(productId, user.getId()) != null) {
+//            throw new BadCredentialsException("Bạn đã đánh giá sản phẩm này rồi!");
+//        }
+        if (reviewRepository.findByProductReview_IdAndUserReview_Id(productId, user.getId()) != null &&
+                LocalDateTime.now().isBefore(
+                        reviewRepository.findByProductReview_IdAndUserReview_Id(productId, user.getId()).getCreatedAt().plusHours(24))
+        ) {
+            Duration remaining = Duration.between(
+                    LocalDateTime.now(),
+                    reviewRepository.findByProductReview_IdAndUserReview_Id(productId, user.getId()).getCreatedAt().plusHours(24)
+            );
+            long hours = remaining.toHours();
+            long minutes = remaining.toMinutes() % 60;
+            throw new BadCredentialsException("Bạn đã đánh giá sản phẩm này. Vui lòng quay lại sau " +
+                    hours + " giờ " + minutes + " phút nữa.");
+        }
+
         AIResponse analysisResult = aiAnalysisService.analyzeText(reviewRequest.getRating(), reviewRequest.getContent());
+
         Map<String, String> clientInfo = clientService.getClientInfo(request);
+
         Review review = new Review();
-            review.setRating(reviewRequest.getRating());
-            review.setContent(reviewRequest.getContent());
-            review.setVerifiedByAI(true);
-            review.setAIComment(analysisResult.getMessage());
-            review.setIpAddress(clientInfo.get("ipAddress"));
-            review.setUserAgent(clientInfo.get("userAgent"));
-            review.setEdited(false);
-            review.setCreatedAt(LocalDateTime.now());
-            review.setProductReview(product);
-            review.setAccountReview(account);
+        review.setRating(reviewRequest.getRating());
+        review.setContent(reviewRequest.getContent());
+        review.setVerifiedByAI(true);
+        review.setAIComment(analysisResult.getMessage());
+        review.setIpAddress(clientInfo.get("ipAddress"));
+        review.setUserAgent(clientInfo.get("userAgent"));
+        review.setEdited(false);
+        review.setCreatedAt(LocalDateTime.now());
+        review.setProductReview(product);
+        review.setUserReview(user);
 
         AIAnalysisLog aiAnalysisLog = new AIAnalysisLog();
-            aiAnalysisLog.setReviewAIAnalysisLog(review);
-            aiAnalysisLog.setAnalysisResult(analysisResult.getResult());
-            aiAnalysisLog.setProcessedAt(LocalDateTime.now());
+        aiAnalysisLog.setReviewAIAnalysisLog(review);
+        aiAnalysisLog.setAnalysisResult(analysisResult.getResult());
+        aiAnalysisLog.setProcessedAt(LocalDateTime.now());
 
-        if (analysisResult.getStatus().contains("GOOD")){
-            aiAnalysisLog.setSpam(false);
-            reviewRepository.save(review);
-            aiAnalysisLogRepository.save(aiAnalysisLog);
-            return review;
-        } else {
-            int spamToday = reviewRepository.countSpamReviewsToday(account.getId(), LocalDate.now());
-            aiAnalysisLog.setSpam(true);
-            reviewRepository.save(review);
-            aiAnalysisLogRepository.save(aiAnalysisLog);
+        boolean isGood = analysisResult.getStatus().contains("GOOD");
+        aiAnalysisLog.setSpam(!isGood);
+
+        reviewRepository.save(review);
+        aiAnalysisLogRepository.save(aiAnalysisLog);
+
+        if (!isGood) {
+            int spamToday = reviewRepository.countSpamReviewsToday(user.getId(), LocalDate.now());
+
             if (spamToday >= 3) {
-                account.setBannedUntil(LocalDateTime.now().plusDays(1));
-                authenticationRepository.save(account);
+                user.setBannedUntil(LocalDateTime.now().plusDays(1));
+                authenticationRepository.save(user);
             }
+
             throw new BadCredentialsException(analysisResult.getMessage());
         }
+
+        return review;
     }
 
     public Review editReview(Long productId, HttpServletRequest request, ReviewRequest reviewRequest) {
         Account account = accountUtils.getAccountCurrent();
-        if (account.getBannedUntil() != null && account.getBannedUntil().isAfter(LocalDateTime.now())) {
-            throw new BadCredentialsException("Tài khoản bị tạm khóa đến " + account.getBannedUntil());
+        if (!(account instanceof Users user)) {
+            throw new BadCredentialsException("Chỉ người dùng mới có thể sửa đánh giá sản phẩm!");
         }
-        Review existingReview = reviewRepository.findByProductReview_IdAndAccountReview_Id(productId, account.getId());
+        if (user.getBannedUntil() != null && user.getBannedUntil().isAfter(LocalDateTime.now())) {
+            throw new BadCredentialsException("Tài khoản bị tạm khóa đến " + user.getBannedUntil());
+        }
+        Review existingReview = reviewRepository.findByProductReview_IdAndUserReview_Id(productId, account.getId());
         if (existingReview != null){
             AIResponse analysisResult = aiAnalysisService.analyzeText(reviewRequest.getRating(), reviewRequest.getContent());
             if (!existingReview.isEdited()){
@@ -119,13 +148,15 @@ public class ReviewService {
                         existingReview.setUserAgent(clientInfo.get("userAgent"));
                         existingReview.setEdited(true);
                         existingReview.setCreatedAt(LocalDateTime.now());
-                        existingReview.setReviewHistories(reviewHistory);
+                        reviewHistory.setReviewHistory(existingReview);
+                        existingReview.getReviewHistories().add(reviewHistory);
                     reviewRepository.save(existingReview);
                     reviewHistoryRepository.save(reviewHistory);
                 } else {
                     reviewHistory.setBeforeModifiedAt(LocalDateTime.now());
                     existingReview.setEdited(true);
-                    existingReview.setReviewHistories(reviewHistory);
+                    reviewHistory.setReviewHistory(existingReview);
+                    existingReview.getReviewHistories().add(reviewHistory);
                     reviewHistory.setReviewHistory(existingReview);
                     reviewRepository.save(existingReview);
                     throw new BadCredentialsException(analysisResult.getMessage() + ". Vì vậy bạn sẽ không được sửa đánh giá này nữa!");
@@ -159,12 +190,12 @@ public class ReviewService {
     }
 
     public ReviewFeedback helpReview(Long reviewId, boolean status) {
-        ReviewFeedback reviewFeedback = reviewFeedbackRepository.findByReviewFeedback_IdAndAccountFeedback_Id(reviewId, accountUtils.getAccountCurrent().getId());
+        ReviewFeedback reviewFeedback = reviewFeedbackRepository.findByReviewFeedback_IdAndUserFeedback_Id(reviewId, accountUtils.getAccountCurrent().getId());
         if (reviewFeedback == null){
             Review review = reviewRepository.findReviewById(reviewId);
             ReviewFeedback newFeedback = new ReviewFeedback();
             newFeedback.setReviewFeedback(review);
-            newFeedback.setAccountFeedback(accountUtils.getAccountCurrent());
+            newFeedback.setUserFeedback(((Users) accountUtils.getAccountCurrent()));
             newFeedback.setHelpful(status);
             return reviewFeedbackRepository.save(newFeedback);
         } else {

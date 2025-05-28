@@ -5,25 +5,27 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
 
-public class ReviewFeedback {
-
+public class UserVoucher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private boolean isHelpful;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime redeemed_at;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable = false)
+    @JoinColumn(name="user_id", nullable = true)
     @JsonIgnore
-    Users userFeedback;
+    Users userVoucher;
 
     @ManyToOne
-    @JoinColumn(name="review_id", nullable = false)
+    @JoinColumn(name="voucher_id", nullable = true)
     @JsonIgnore
-    Review reviewFeedback;
+    Voucher voucherUser;
 }

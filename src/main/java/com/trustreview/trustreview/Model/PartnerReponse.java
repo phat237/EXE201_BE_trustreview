@@ -1,6 +1,6 @@
 package com.trustreview.trustreview.Model;
 
-import com.trustreview.trustreview.Entity.Account;
+import com.trustreview.trustreview.Entity.Partner;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class AccountReponse extends Account {
+public class PartnerReponse extends Partner {
     String token;
 }

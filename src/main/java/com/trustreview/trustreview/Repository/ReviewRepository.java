@@ -20,13 +20,13 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT COUNT(r) " +
             "FROM Review r " +
-            "WHERE r.accountReview.id = :userId " +
+            "WHERE r.userReview.id = :userId " +
             "AND r.isVerifiedByAI = true " +
             "AND r.aiAnalysisLog.isSpam = true " +
             "AND DATE(r.createdAt) = :todayDate")
     int countSpamReviewsToday(@Param("userId") Long userId, @Param("todayDate") LocalDate todayDate);
 
-    Review findByProductReview_IdAndAccountReview_Id(Long productId, Long accountId);
+    Review findByProductReview_IdAndUserReview_Id(Long productId, Long accountId);
 
     @Query("SELECT r FROM Review r " +
             "JOIN r.aiAnalysisLog a " +

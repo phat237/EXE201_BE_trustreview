@@ -11,25 +11,26 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 
-public class ReviewReport {
-
+public class PartnerPackage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String reason;
+    @Column(nullable = false)
+    private LocalDateTime startDate;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(nullable = false)
+    private LocalDateTime endDate;
 
-    @ManyToOne
-    @JoinColumn(name="user_id", nullable = false)
-    @JsonIgnore
-    Users userReport;
+    private boolean isActive;
 
     @ManyToOne
-    @JoinColumn(name="review_id", nullable = false)
+    @JoinColumn(name="package_id", nullable = false)
     @JsonIgnore
-    Review reviewReport;
+    PremiumPackage premiumPartner;
+
+    @ManyToOne
+    @JoinColumn(name="partner_id", nullable = false)
+    @JsonIgnore
+    Partner partnerPackage;
 }

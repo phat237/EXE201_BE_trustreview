@@ -18,8 +18,9 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
+@Inheritance(strategy = InheritanceType.JOINED)
 
-public class Account implements UserDetails {
+public abstract class Account implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,9 +28,6 @@ public class Account implements UserDetails {
 
     @Column(unique = true, nullable = false)
     private String username;
-
-    @Column(nullable = false)
-    private String displayName;
 
     private String email;
 
@@ -42,28 +40,8 @@ public class Account implements UserDetails {
     @Enumerated(EnumType.STRING)
     private AccountStatus status;
 
-    private LocalDateTime bannedUntil;
-
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
-    @OneToMany(mappedBy = "accountAdRequest", cascade = CascadeType.ALL)
-    @JsonIgnore
-    Set<AdRequest> adRequest;
-
-    @OneToMany(mappedBy = "accountReview", cascade = CascadeType.ALL)
-    @JsonIgnore
-    Set<Review> reviews;
-
-    @OneToMany(mappedBy = "accountReport", cascade = CascadeType.ALL)
-    @JsonIgnore
-    Set<ReviewReport> reviewReports;
-
-    @OneToMany(mappedBy = "accountFeedback", cascade = CascadeType.ALL)
-    @JsonIgnore
-    Set<ReviewFeedback> reviewFeedbacks;
-
-
 
     @Override
     public String getPassword() {

@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 
-public class RegisterRequest {
+public class RegisterUserRequest {
     private String username;
     private String displayName;
     private String email;

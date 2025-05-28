@@ -26,8 +26,9 @@ public class ReviewHistory {
     @Column(nullable = false, updatable = false)
     private LocalDateTime beforeModifiedAt;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="review_id", nullable = false)
     @JsonIgnore
     Review reviewHistory;
+
 }

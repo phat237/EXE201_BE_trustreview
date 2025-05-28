@@ -2,15 +2,13 @@ package com.trustreview.trustreview.Service;
 
 import com.trustreview.trustreview.Config.SecurityConfig;
 import com.trustreview.trustreview.Entity.Account;
+import com.trustreview.trustreview.Entity.Partner;
+import com.trustreview.trustreview.Entity.Users;
 import com.trustreview.trustreview.Enums.AccountRoles;
 import com.trustreview.trustreview.Enums.AccountStatus;
-import com.trustreview.trustreview.Model.AccountReponse;
-import com.trustreview.trustreview.Model.ChangePasswordRequest;
-import com.trustreview.trustreview.Model.LoginRequest;
-import com.trustreview.trustreview.Model.RegisterRequest;
+import com.trustreview.trustreview.Model.*;
 import com.trustreview.trustreview.Repository.AuthenticationRepository;
 import com.trustreview.trustreview.Utils.AccountUtils;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +61,7 @@ public class AuthenticationService implements UserDetailsService {
         return account;
     }
 
-    public AccountReponse login(LoginRequest loginRequest) {
+    public Object login(LoginRequest loginRequest) {
         try {
             if(loginRequest == null || loginRequest.getPassword().isEmpty() || loginRequest.getUsername().isEmpty()){
                 throw new BadCredentialsException("Vui lòng điền đầy đủ thông tin đăng nhập!");
@@ -80,45 +78,73 @@ public class AuthenticationService implements UserDetailsService {
                 throw new AuthenticationServiceException("Tài khoản bạn đã bị khóa!");
             }
 
-            AccountReponse accountReponse = new AccountReponse();
             String token = tokenService.generateToken(account);
-            accountReponse.setUsername(account.getUsername());
-            accountReponse.setId(account.getId());
-            accountReponse.setDisplayName(account.getDisplayName());
-            accountReponse.setEmail(account.getEmail());
-            accountReponse.setRole(account.getRole());
-            accountReponse.setStatus(account.getStatus());
-            accountReponse.setCreatedAt(LocalDateTime.now());
-            accountReponse.setToken(token);
-            return accountReponse;
+
+            if (account.getRole().equals(AccountRoles.USER) || account.getRole().equals(AccountRoles.ADMIN)){
+                UserReponse userReponse = new UserReponse();
+                userReponse.setUsername(account.getUsername());
+                userReponse.setId(account.getId());
+                userReponse.setEmail(account.getEmail());
+                userReponse.setRole(account.getRole());
+                userReponse.setStatus(account.getStatus());
+                userReponse.setCreatedAt(account.getCreatedAt());
+                userReponse.setDisplayName(((Users) account).getDisplayName());
+                userReponse.setBannedUntil(((Users) account).getBannedUntil());
+                userReponse.setPoint(((Users) account).getPoint());
+                userReponse.setToken(token);
+                return userReponse;
+            } else if (account.getRole().equals(AccountRoles.PARTNER)){
+                PartnerReponse partnerReponse = new PartnerReponse();
+                partnerReponse.setUsername(account.getUsername());
+                partnerReponse.setId(account.getId());
+                partnerReponse.setEmail(account.getEmail());
+                partnerReponse.setRole(account.getRole());
+                partnerReponse.setStatus(account.getStatus());
+                partnerReponse.setCreatedAt(account.getCreatedAt());
+                partnerReponse.setCompanyName(((Partner) account).getCompanyName());
+                partnerReponse.setBusinessRegistrationNumber(((Partner) account).getBusinessRegistrationNumber());
+                partnerReponse.setWebsite(((Partner) account).getWebsite());
+                partnerReponse.setContactPhone(((Partner) account).getContactPhone());
+                partnerReponse.setMoney(((Partner) account).getMoney());
+                partnerReponse.setToken(token);
+                return partnerReponse;
+            } else {
+                return null;
+            }
+
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Tên đăng nhập hoặc mật khẩu không đúng!");
         }
     }
 
-    public Account register(RegisterRequest registerRequest) {
+    public Users registerUser(RegisterUserRequest registerRequest) {
         if (authenticationRepository.findByUsername(registerRequest.getUsername()) != null){
             throw new BadCredentialsException("Tên đăng nhập bị trùng, vui lòng chọn một tên khác!");
         }
-        Account account = new Account();
-        account.setUsername(registerRequest.getUsername());
-        account.setDisplayName(registerRequest.getDisplayName());
-        account.setEmail(registerRequest.getEmail());
-        account.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        account.setRole(AccountRoles.USER);
-        account.setStatus(AccountStatus.ACTIVE);
-        account.setCreatedAt(LocalDateTime.now());
-        return authenticationRepository.save(account);
+        Users user = new Users();
+        user.setUsername(registerRequest.getUsername());
+        user.setDisplayName(registerRequest.getDisplayName());
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        user.setPoint(0);
+        user.setRole(AccountRoles.USER);
+        user.setStatus(AccountStatus.ACTIVE);
+        user.setCreatedAt(LocalDateTime.now());
+        return authenticationRepository.save(user);
     }
 
-    public String updateDisplayName(Long id, String displaynameRequest) {
+    public String updateDisplayName(Long id, String displayNameRequest) {
         Account account = authenticationRepository.findAccountById(id);
-        if (account != null){
-            account.setDisplayName(displaynameRequest);
-            authenticationRepository.save(account);
-            return "Đã cập nhật tên hiển thị thành " + displaynameRequest + "!";
+        if (account == null) {
+            return "Tài khoản không tồn tại!";
+        }
+        if (account instanceof Users) {
+            Users user = (Users) account;
+            user.setDisplayName(displayNameRequest);
+            authenticationRepository.save(user);
+            return "Đã cập nhật tên hiển thị thành " + displayNameRequest + "!";
         } else {
-            return "Cập nhật tên hiển thị không thành công!";
+            return "Chỉ tài khoản người dùng mới được phép cập nhật tên hiển thị!";
         }
     }
 
@@ -140,5 +166,24 @@ public class AuthenticationService implements UserDetailsService {
         } else {
             return "Có lỗi xảy ra, xóa tài khoản không thành công!";
         }
+    }
+
+    public Partner registerPartner(RegisterPartnerRequest registerPartnerRequest) {
+        if (authenticationRepository.findByUsername(registerPartnerRequest.getUsername()) != null){
+            throw new BadCredentialsException("Tên đăng nhập bị trùng, vui lòng chọn một tên khác!");
+        }
+        Partner partner = new Partner();
+        partner.setUsername(registerPartnerRequest.getUsername());
+        partner.setEmail(registerPartnerRequest.getEmail());
+        partner.setPassword(passwordEncoder.encode(registerPartnerRequest.getPassword()));
+        partner.setCompanyName(registerPartnerRequest.getCompanyName());
+        partner.setBusinessRegistrationNumber(registerPartnerRequest.getBusinessRegistrationNumber());
+        partner.setContactPhone(registerPartnerRequest.getContactPhone());
+        partner.setWebsite(registerPartnerRequest.getWebsite());
+        partner.setMoney(0.0);
+        partner.setRole(AccountRoles.PARTNER);
+        partner.setStatus(AccountStatus.ACTIVE);
+        partner.setCreatedAt(LocalDateTime.now());
+        return authenticationRepository.save(partner);
     }
 }

@@ -6,30 +6,35 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 
-public class ReviewReport {
-
+public class Voucher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String reason;
+    private String code;
+
+    private String description;
+
+    private Integer requiredPoint;
+
+    private boolean isActive;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable = false)
+    @JoinColumn(name="partner_id", nullable = false)
     @JsonIgnore
-    Users userReport;
+    Partner partnerVoucher;
 
-    @ManyToOne
-    @JoinColumn(name="review_id", nullable = false)
+    @OneToMany(mappedBy = "voucherUser", cascade = CascadeType.ALL)
     @JsonIgnore
-    Review reviewReport;
+    Set<UserVoucher> userVouchers;
 }

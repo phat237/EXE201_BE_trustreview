@@ -1,15 +1,17 @@
 package com.trustreview.trustreview.API;
 
 import com.trustreview.trustreview.Entity.Account;
+import com.trustreview.trustreview.Entity.Partner;
+import com.trustreview.trustreview.Entity.Users;
 import com.trustreview.trustreview.Model.ChangePasswordRequest;
 import com.trustreview.trustreview.Model.LoginRequest;
-import com.trustreview.trustreview.Model.RegisterRequest;
+import com.trustreview.trustreview.Model.RegisterPartnerRequest;
+import com.trustreview.trustreview.Model.RegisterUserRequest;
 import com.trustreview.trustreview.Service.AuthenticationService;
 import com.trustreview.trustreview.Utils.AccountUtils;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,14 +29,20 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequest loginRequest) {
-        Account account = authenticationService.login(loginRequest);
+        Object account = authenticationService.login(loginRequest);
         return ResponseEntity.ok(account);
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<Account> register(@RequestBody RegisterRequest registerRequest) {
-        Account account = authenticationService.register(registerRequest);
-        return ResponseEntity.ok(account);
+    @PostMapping("/register/user")
+    public ResponseEntity<Users> register(@RequestBody RegisterUserRequest registerRequest) {
+        Users user = authenticationService.registerUser(registerRequest);
+        return ResponseEntity.ok(user);
+    }
+
+    @PostMapping("/register/partner")
+    public ResponseEntity<Partner> registerPartner(@RequestBody RegisterPartnerRequest registerPartnerRequest) {
+        Partner partner = authenticationService.registerPartner(registerPartnerRequest);
+        return ResponseEntity.ok(partner);
     }
 
     @GetMapping("/accountCurrent")
