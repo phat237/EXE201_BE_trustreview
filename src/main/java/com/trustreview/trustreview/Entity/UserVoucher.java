@@ -17,7 +17,7 @@ public class UserVoucher {
     private Long id;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime redeemed_at;
+    private LocalDateTime redeemedAt;
 
     @ManyToOne
     @JoinColumn(name="user_id", nullable = true)

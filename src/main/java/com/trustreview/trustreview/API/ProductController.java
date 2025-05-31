@@ -2,11 +2,16 @@ package com.trustreview.trustreview.API;
 
 import com.trustreview.trustreview.Entity.Account;
 import com.trustreview.trustreview.Entity.Product;
+import com.trustreview.trustreview.Entity.Review;
 import com.trustreview.trustreview.Enums.ProductCategory;
 import com.trustreview.trustreview.Model.ProductRequest;
 import com.trustreview.trustreview.Service.ProductService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,5 +46,12 @@ public class ProductController {
     @DeleteMapping("/{productId}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long productId) {
         return ResponseEntity.ok(productService.deleteAProduct(productId));
+    }
+
+    @GetMapping("/{page}/{size}/paging")
+    public ResponseEntity<Page<Product>> getProductPaging(@PathVariable int page, int size) {
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return ResponseEntity.ok(productService.getPagingProduct(pageable));
     }
 }

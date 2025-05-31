@@ -1,10 +1,13 @@
 package com.trustreview.trustreview.Service;
 
 import com.trustreview.trustreview.Entity.Product;
+import com.trustreview.trustreview.Entity.Review;
 import com.trustreview.trustreview.Enums.ProductCategory;
 import com.trustreview.trustreview.Model.ProductRequest;
 import com.trustreview.trustreview.Repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
@@ -63,5 +66,10 @@ public class ProductService {
         } else {
             return "Đã có lỗi xảy ra, xóa sản phẩm không thành công!";
         }
+    }
+
+    public Page<Product> getPagingProduct(Pageable pageable) {
+        Page<Product> products = productRepository.findAll(pageable);
+        return products;
     }
 }
