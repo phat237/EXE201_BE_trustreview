@@ -44,6 +44,12 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getReview(productId, pageable));
     }
 
+    @GetMapping("/review/{id}")
+    public ResponseEntity<Review> getReviewById(@PathVariable("id") Long reviewId) {
+        Review review = reviewService.getReviewById(reviewId);
+        return ResponseEntity.ok(review);
+    }
+
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<String> deleteReview(@PathVariable Long reviewId) {
         return ResponseEntity.ok(reviewService.deleteAReview(reviewId));

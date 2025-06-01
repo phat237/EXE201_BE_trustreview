@@ -5,6 +5,7 @@ import com.trustreview.trustreview.Model.AIResponse;
 import com.trustreview.trustreview.Model.ReviewRequest;
 import com.trustreview.trustreview.Repository.*;
 import com.trustreview.trustreview.Utils.AccountUtils;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -179,6 +180,12 @@ public class ReviewService {
             throw new BadCredentialsException("Đã xảy ra lỗi vui lòng thử lại!");
         }
     }
+
+    public Review getReviewById(Long reviewId) {
+        return reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy đánh giá với ID: " + reviewId));
+    }
+
 
     public String deleteAReview(Long reviewId) {
         if (reviewRepository.findReviewById(reviewId) != null) {
