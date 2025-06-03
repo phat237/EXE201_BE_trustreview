@@ -29,13 +29,26 @@ public class UserVoucherService {
     private AccountUtils accountUtils;
 
     public UserVoucher redeemVoucher(Long voucherId) {
-        Users user = (Users) accountUtils.getAccountCurrent();
+        Account account = accountUtils.getAccountCurrent();
+        if (!(account instanceof Users user)) {
+            throw new BadCredentialsException("Chỉ user mới được phép đổi voucher");
+        }
 
         Voucher voucher = voucherRepository.findById(voucherId)
                 .orElseThrow(() -> new BadCredentialsException("Voucher không tồn tại"));
 
+        boolean alreadyRedeemedInBatch = userVoucherRepository.existsByUserVoucherAndVoucherUser_BatchCode(user, voucher.getBatchCode());
+
+        if (alreadyRedeemedInBatch) {
+            throw new BadCredentialsException("Bạn đã đổi voucher trong đợt này rồi");
+        }
+
         if (!voucher.isActive()) {
             throw new BadCredentialsException("Voucher đã bị vô hiệu hóa hoặc hết hạn");
+        }
+
+        if (voucher.isHasBeenRedeemed()){
+            throw new BadCredentialsException("Voucher này đã được đổi!");
         }
 
         if (user.getPoint() < voucher.getRequiredPoint()) {
@@ -49,7 +62,7 @@ public class UserVoucherService {
         user.setPoint(user.getPoint() - voucher.getRequiredPoint());
         authenticationRepository.save(user);
 
-        voucher.setActive(false);
+        voucher.setHasBeenRedeemed(true);
         voucherRepository.save(voucher);
 
         UserVoucher userVoucher = new UserVoucher();

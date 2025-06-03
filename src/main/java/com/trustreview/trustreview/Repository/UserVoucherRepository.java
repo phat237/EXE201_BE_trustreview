@@ -15,4 +15,6 @@ public interface UserVoucherRepository extends JpaRepository<UserVoucher, Long> 
 
     Page<UserVoucher> findByUserVoucher_Id(Long userId, Pageable pageable);
 
+    boolean existsByUserVoucherAndVoucherUser_BatchCode(Users user, String batchCode);
+
 }

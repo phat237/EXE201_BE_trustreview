@@ -1,6 +1,7 @@
 package com.trustreview.trustreview.API;
 
 import com.trustreview.trustreview.Entity.Voucher;
+import com.trustreview.trustreview.Model.VoucherBatchUpdateRequest;
 import com.trustreview.trustreview.Model.VoucherCreateRequest;
 import com.trustreview.trustreview.Service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,7 @@ public class VoucherController {
         return ResponseEntity.ok(
                 voucherService.createVouchersFromInput(
                         request.getCodes(),
-                        request.getDescription(),
-                        request.getRequiredPoint()
+                        request.getDescription()
                 )
         );
     }
@@ -38,5 +38,16 @@ public class VoucherController {
     public ResponseEntity<String> deleteVoucher(@PathVariable Long id) {
         voucherService.deleteVoucher(id);
         return ResponseEntity.ok("Xóa voucher thành công");
+    }
+
+    @PutMapping("/batch-update")
+    public ResponseEntity<String> updateVoucherBatch(@RequestBody VoucherBatchUpdateRequest request) {
+        int updatedCount = voucherService.updateBatchDetails(
+                request.getBatchCode(),
+                request.getDescription(),
+                request.getRequiredPoint(),
+                request.isActive()
+        );
+        return ResponseEntity.ok("Updated " + updatedCount + " vouchers for batch " + request.getBatchCode());
     }
 }

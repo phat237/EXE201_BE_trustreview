@@ -7,7 +7,10 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-public class VoucherCreateRequest {
-    private String codes;
+
+public class VoucherBatchUpdateRequest {
+    private String batchCode;
     private String description;
+    private Integer requiredPoint;
+    private boolean isActive;
 }

@@ -26,6 +26,12 @@ public class Voucher {
 
     private boolean isActive;
 
+    @Column(nullable = false)
+    private String batchCode;
+
+    @Column(nullable = false)
+    private boolean hasBeenRedeemed = false;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
