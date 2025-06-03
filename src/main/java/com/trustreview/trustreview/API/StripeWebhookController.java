@@ -26,6 +26,7 @@ public class StripeWebhookController {
             System.out.println("📩 Nhận webhook payload: " + payload);
 
             Event event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
+
             System.out.println("✅ Event type: " + event.getType());
 
             if ("checkout.session.completed".equals(event.getType())) {
