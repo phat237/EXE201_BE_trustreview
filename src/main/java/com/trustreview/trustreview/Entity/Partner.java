@@ -40,4 +40,8 @@ public class Partner extends Account{
     @OneToMany(mappedBy = "partnerVoucher", cascade = CascadeType.ALL)
     @JsonIgnore
     Set<Voucher> partnerVouchers;
+
+    @OneToMany(mappedBy = "partnerTransaction", cascade = CascadeType.ALL)
+    @JsonIgnore
+    Set<Transaction> transactions;
 }

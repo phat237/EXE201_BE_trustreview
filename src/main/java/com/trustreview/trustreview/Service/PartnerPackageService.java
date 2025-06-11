@@ -3,6 +3,7 @@ package com.trustreview.trustreview.Service;
 import com.trustreview.trustreview.Entity.*;
 import com.trustreview.trustreview.Repository.AuthenticationRepository;
 import com.trustreview.trustreview.Repository.PartnerPackageRepository;
+import com.trustreview.trustreview.Repository.PartnerRepository;
 import com.trustreview.trustreview.Repository.PremiumPackageRepository;
 import com.trustreview.trustreview.Utils.AccountUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,13 +29,16 @@ public class PartnerPackageService {
     @Autowired
     private AuthenticationRepository authenticationRepository;
 
-    public PartnerPackage purchasePackage(Long packageId, HttpServletRequest request) {
+    @Autowired
+    private PartnerRepository partnerRepository;
+
+    public PartnerPackage purchasePackage(Long packageId, Long partnerId) {
         PremiumPackage premium = premiumPackageRepository.findById(packageId)
                 .orElseThrow(() -> new BadCredentialsException("Gói premium không tồn tại"));
 
-        Account account = accountUtils.getAccountCurrent();
-        if (!(account instanceof Partner partner)) {
-            throw new BadCredentialsException("Chỉ partner mới được phép mua gói premium");
+        Partner partner = partnerRepository.findById(partnerId).orElse(null);
+        if (partner == null){
+            throw new BadCredentialsException("Partner này không tồn tại");
         }
 
         double currentMoney = partner.getMoney();

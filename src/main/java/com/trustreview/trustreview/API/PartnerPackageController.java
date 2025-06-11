@@ -17,9 +17,9 @@ public class PartnerPackageController {
     @Autowired
     private PartnerPackageService partnerPackageService;
 
-    @PostMapping("/{packageId}")
-    public ResponseEntity<PartnerPackage> purchasePremiumPackage(@PathVariable Long packageId, HttpServletRequest request) {
-        PartnerPackage partnerPackage = partnerPackageService.purchasePackage(packageId, request);
+    @PostMapping("/{packageId}/{partnerId}")
+    public ResponseEntity<PartnerPackage> purchasePremiumPackage(@PathVariable Long packageId, @PathVariable Long partnerId) {
+        PartnerPackage partnerPackage = partnerPackageService.purchasePackage(packageId, partnerId);
         return ResponseEntity.ok(partnerPackage);
     }
 
