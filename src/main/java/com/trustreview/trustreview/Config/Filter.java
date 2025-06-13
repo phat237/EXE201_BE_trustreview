@@ -36,10 +36,12 @@ public class Filter extends OncePerRequestFilter {
             "/accounts/login",
             "/accounts/register/partner",
             "/accounts/register/user",
+            "/reviews/{productId}/{page}/{size}/paging",
+            "/products/{page}/{size}/paging",
+            "/premium-packages",
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/swagger-resources/**",
-            "/test-conn"
+            "/swagger-resources/**"
     );
 
     private boolean isPermitted(String uri) {

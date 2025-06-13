@@ -50,7 +50,9 @@ public class SecurityConfig {
                                 "/accounts/login",
                                         "/accounts/register/partner",
                                         "/accounts/register/user",
-                                        "/test-conn",
+                                        "/reviews/{productId}/{page}/{size}/paging",
+                                        "/products/{page}/{size}/paging",
+                                        "/premium-packages",
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**",
                                         "/swagger-ui.html"
