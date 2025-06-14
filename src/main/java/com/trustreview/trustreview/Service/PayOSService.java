@@ -48,8 +48,8 @@ public class PayOSService {
                 .orderCode(orderCode)
                 .amount(premiumPackage.getPrice().intValue())
                 .description(premiumPackage.getName())
-                .returnUrl("http://localhost:8080/success?orderCode=" + orderCode + "&partnerId=" + partner.getId())
-                .cancelUrl("http://localhost:8080/fail")
+                .returnUrl("http://localhost:5173/checkout/success?orderCode=" + orderCode + "&partnerId=" + partner.getId())
+                .cancelUrl("http://localhost:5173/checkout/fail")
                 .item(itemData)
                 .build();
         return payOS.createPaymentLink(paymentData);
