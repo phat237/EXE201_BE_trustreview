@@ -34,9 +34,9 @@ public class TransactionController {
     }
 
     // Dùng khi webhook từ PayOS gọi về
-    @PostMapping("/success/{orderCode}/{partnerId}")
-    public ResponseEntity<?> markSuccess(@PathVariable Long orderCode, @PathVariable Long partnerId) {
-        transactionService.markSuccess(orderCode, partnerId);
+    @PostMapping("/success/{orderCode}/{partnerId}/{packageId}")
+    public ResponseEntity<?> markSuccess(@PathVariable Long orderCode, @PathVariable Long partnerId, @PathVariable Long packageId) {
+        transactionService.markSuccess(orderCode, partnerId, packageId);
         return ResponseEntity.ok("Success updated");
     }
 

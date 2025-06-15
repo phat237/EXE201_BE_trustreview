@@ -30,6 +30,9 @@ public class TransactionService {
     @Autowired
     private final PartnerRepository partnerRepository;
 
+    @Autowired
+    private final PartnerPackageService partnerPackageService;
+
     private final AccountUtils accountUtils;
 
 
@@ -59,7 +62,7 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
-    public void markSuccess(Long orderCode, Long partnerId) {
+    public void markSuccess(Long orderCode, Long partnerId, Long pakageId) {
         Optional<Transaction> optional = transactionRepository.findByOrderCode(orderCode);
         optional.ifPresent(tx -> {
             tx.setStatus("SUCCESS");
@@ -69,6 +72,7 @@ public class TransactionService {
             }
             partner.setMoney(partner.getMoney() + tx.getAmount());
             partnerRepository.save(partner);
+            partnerPackageService.purchasePackage(pakageId, partnerId);
             transactionRepository.save(tx);
         });
     }
