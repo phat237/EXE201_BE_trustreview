@@ -2,6 +2,7 @@ package com.trustreview.trustreview.Service;
 
 import com.trustreview.trustreview.Entity.*;
 import com.trustreview.trustreview.Model.AIResponse;
+import com.trustreview.trustreview.Model.AverageRatingResponse;
 import com.trustreview.trustreview.Model.ReviewRequest;
 import com.trustreview.trustreview.Repository.*;
 import com.trustreview.trustreview.Utils.AccountUtils;
@@ -215,4 +216,25 @@ public class ReviewService {
         }
         return reviewFeedback;
     }
+
+    public long countFeedbackByReviewIdAndStatus(Long reviewId, boolean status) {
+        return reviewFeedbackRepository.countByReviewFeedback_IdAndIsHelpful(reviewId, status);
+    }
+
+
+    public AverageRatingResponse getAverageRatingAndCount(Long productId) {
+        Double avg = reviewRepository.findAverageRatingByProductId(productId);
+        Long count = reviewRepository.countValidReviewsByProductId(productId);
+        if (avg == null) avg = 0.0;
+
+        double rounded = Math.floor(avg * 10) / 10;
+        if (avg - rounded >= 0.05) {
+            rounded += 0.1;
+        }
+        double finalAvg = Math.round(rounded * 10) / 10.0;
+
+        return new AverageRatingResponse(finalAvg, count);
+    }
+
+
 }

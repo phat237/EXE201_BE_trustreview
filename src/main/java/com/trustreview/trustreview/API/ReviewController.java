@@ -2,6 +2,7 @@ package com.trustreview.trustreview.API;
 
 import com.trustreview.trustreview.Entity.Review;
 import com.trustreview.trustreview.Entity.ReviewFeedback;
+import com.trustreview.trustreview.Model.AverageRatingResponse;
 import com.trustreview.trustreview.Model.ReviewRequest;
 import com.trustreview.trustreview.Service.ReviewService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -60,5 +61,20 @@ public class ReviewController {
         ReviewFeedback reviewFeedback = reviewService.helpReview(reviewId, status);
         return ResponseEntity.ok(reviewFeedback);
     }
+
+    @GetMapping("/helpful/count/{reviewId}")
+    public ResponseEntity<Long> countFeedbackByStatus(
+            @PathVariable Long reviewId,
+            @RequestParam boolean status) {
+        long count = reviewService.countFeedbackByReviewIdAndStatus(reviewId, status);
+        return ResponseEntity.ok(count);
+    }
+
+    @GetMapping("/average-rating/{productId}")
+    public ResponseEntity<AverageRatingResponse> getAverageRating(@PathVariable Long productId) {
+        return ResponseEntity.ok(reviewService.getAverageRatingAndCount(productId));
+    }
+
+
 
 }

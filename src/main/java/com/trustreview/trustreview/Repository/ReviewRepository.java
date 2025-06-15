@@ -33,4 +33,13 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "WHERE r.productReview.id = :productId AND a.isSpam = false")
     Page<Review> findByProductIdAndNotSpam(@Param("productId") Long productId, Pageable pageable);
 
+    @Query("SELECT AVG(r.rating) FROM Review r " +
+            "JOIN r.aiAnalysisLog a " +
+            "WHERE r.productReview.id = :productId AND a.isSpam = false")
+    Double findAverageRatingByProductId(@Param("productId") Long productId);
+
+    @Query("SELECT COUNT(r) FROM Review r " +
+            "JOIN r.aiAnalysisLog a " +
+            "WHERE r.productReview.id = :productId AND a.isSpam = false")
+    Long countValidReviewsByProductId(@Param("productId") Long productId);
 }

@@ -9,4 +9,7 @@ import org.springframework.stereotype.Repository;
 
 public interface ReviewFeedbackRepository extends JpaRepository<ReviewFeedback, Long> {
     ReviewFeedback findByReviewFeedback_IdAndUserFeedback_Id(Long reviewId, Long accountId);
+
+    long countByReviewFeedback_IdAndIsHelpful(Long reviewId, boolean status);
+
 }
