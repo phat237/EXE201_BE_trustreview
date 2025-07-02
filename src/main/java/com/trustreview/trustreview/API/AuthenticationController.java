@@ -3,10 +3,7 @@ package com.trustreview.trustreview.API;
 import com.trustreview.trustreview.Entity.Account;
 import com.trustreview.trustreview.Entity.Partner;
 import com.trustreview.trustreview.Entity.Users;
-import com.trustreview.trustreview.Model.ChangePasswordRequest;
-import com.trustreview.trustreview.Model.LoginRequest;
-import com.trustreview.trustreview.Model.RegisterPartnerRequest;
-import com.trustreview.trustreview.Model.RegisterUserRequest;
+import com.trustreview.trustreview.Model.*;
 import com.trustreview.trustreview.Service.AuthenticationService;
 import com.trustreview.trustreview.Utils.AccountUtils;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -46,8 +43,9 @@ public class AuthenticationController {
     }
 
     @GetMapping("/accountCurrent")
-    public Account current() {
-        return accountUtils.getAccountCurrent();
+    public ResponseEntity<?> current() {
+        Account account = accountUtils.getAccountCurrent();
+        return ResponseEntity.ok(account);
     }
 
     @PutMapping("/displayName/{id}/{displayname}")

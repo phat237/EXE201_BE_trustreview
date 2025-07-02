@@ -42,4 +42,17 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "JOIN r.aiAnalysisLog a " +
             "WHERE r.productReview.id = :productId AND a.isSpam = false")
     Long countValidReviewsByProductId(@Param("productId") Long productId);
+
+    @Query("SELECT COUNT(r) FROM Review r WHERE r.userReview.id = :accountId")
+    long countByAccountId(@Param("accountId") Long accountId);
+
+    @Query("SELECT COUNT(rf) FROM ReviewFeedback rf WHERE rf.reviewFeedback.userReview.id = :accountId AND rf.isHelpful = true")
+    Long sumHelpfulCountByAccountId(@Param("accountId") Long accountId);
+
+    @Query("SELECT AVG(r.rating) FROM Review r WHERE r.userReview.id = :accountId")
+    Double averageRatingByAccountId(@Param("accountId") Long accountId);
+
+    @Query("SELECT COUNT(r) FROM Review r WHERE r.userReview.id = :accountId AND r.isVerifiedByAI = true")
+    long countVerifiedByAccountId(@Param("accountId") Long accountId);
+
 }

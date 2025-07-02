@@ -15,6 +15,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @CrossOrigin
 @RequestMapping("/products")
@@ -54,4 +56,23 @@ public class ProductController {
         Pageable pageable = PageRequest.of(page, size, sort);
         return ResponseEntity.ok(productService.getPagingProduct(pageable));
     }
+
+    @GetMapping("/sorted-by-rating")
+    public ResponseEntity<Page<Product>> getProductsSortedByRating(
+            @RequestParam int page,
+            @RequestParam int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(productService.getProductsSortedByRating(pageable));
+    }
+
+    @GetMapping("/{productId}/related")
+    public ResponseEntity<Page<Product>> getRelatedProducts(
+            @PathVariable Long productId,
+            @RequestParam int page,
+            @RequestParam int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(productService.getRelatedProducts(productId, pageable));
+    }
+
+
 }

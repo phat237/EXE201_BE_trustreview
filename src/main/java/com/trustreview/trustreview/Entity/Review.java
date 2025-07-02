@@ -50,7 +50,7 @@ public class Review {
 
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
-    @JsonIgnore
+//    @JsonIgnore
     Users userReview;
 
     @OneToMany(mappedBy = "reviewHistory", cascade = CascadeType.ALL)

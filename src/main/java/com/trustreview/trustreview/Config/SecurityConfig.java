@@ -53,6 +53,8 @@ public class SecurityConfig {
                                         "/reviews/{productId}/{page}/{size}/paging",
                                         "/products/{page}/{size}/paging",
                                         "/premium-packages",
+                                        "/products/sorted-by-rating",
+                                        "/products/{productId}/related",
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**",
                                         "/swagger-ui.html"

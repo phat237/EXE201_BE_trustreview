@@ -38,6 +38,8 @@ public class Filter extends OncePerRequestFilter {
             "/accounts/register/user",
             "/reviews/{productId}/{page}/{size}/paging",
             "/products/{page}/{size}/paging",
+            "/products/sorted-by-rating",
+            "/products/{productId}/related",
             "/premium-packages",
             "/swagger-ui/**",
             "/v3/api-docs/**",

@@ -4,6 +4,7 @@ import com.trustreview.trustreview.Entity.Review;
 import com.trustreview.trustreview.Entity.ReviewFeedback;
 import com.trustreview.trustreview.Model.AverageRatingResponse;
 import com.trustreview.trustreview.Model.ReviewRequest;
+import com.trustreview.trustreview.Model.ReviewStatsResponse;
 import com.trustreview.trustreview.Service.ReviewService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
@@ -75,6 +76,9 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getAverageRatingAndCount(productId));
     }
 
-
+    @GetMapping("/stats")
+    public ResponseEntity<ReviewStatsResponse> getStatsByAccount() {
+        return ResponseEntity.ok(reviewService.getReviewStatsByAccount());
+    }
 
 }

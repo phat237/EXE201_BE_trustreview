@@ -4,6 +4,7 @@ import com.trustreview.trustreview.Entity.*;
 import com.trustreview.trustreview.Model.AIResponse;
 import com.trustreview.trustreview.Model.AverageRatingResponse;
 import com.trustreview.trustreview.Model.ReviewRequest;
+import com.trustreview.trustreview.Model.ReviewStatsResponse;
 import com.trustreview.trustreview.Repository.*;
 import com.trustreview.trustreview.Utils.AccountUtils;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,6 +19,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 
@@ -236,5 +238,14 @@ public class ReviewService {
         return new AverageRatingResponse(finalAvg, count);
     }
 
+
+    public ReviewStatsResponse getReviewStatsByAccount() {
+        Long accountId = accountUtils.getAccountCurrent().getId();
+        long total = reviewRepository.countByAccountId(accountId);
+        long helpful = Optional.ofNullable(reviewRepository.sumHelpfulCountByAccountId(accountId)).orElse(0L);
+        double avg = Optional.ofNullable(reviewRepository.averageRatingByAccountId(accountId)).orElse(0.0);
+        long verified = reviewRepository.countVerifiedByAccountId(accountId);
+        return new ReviewStatsResponse(total, helpful, avg, verified);
+    }
 
 }
