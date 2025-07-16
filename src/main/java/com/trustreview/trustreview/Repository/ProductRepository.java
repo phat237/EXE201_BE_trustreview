@@ -57,4 +57,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                        @Param("category") ProductCategory category);
 
     Page<Product> findByNameContainingIgnoreCase(String keyword, Pageable pageable);
+
+    @Query("SELECT COUNT(p) FROM Product p WHERE p.brandName = :brandName")
+    long countByBrandName(@Param("brandName") String brandName);
+
+    @Query("SELECT SUM(p.viewCount) FROM Product p WHERE p.brandName = :brandName")
+    Long getTotalViewCountByBrand(@Param("brandName") String brandName);
+
 }

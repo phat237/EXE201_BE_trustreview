@@ -83,4 +83,16 @@ public class ProductController {
         Page<Product> result = productService.searchProductsPaged(keyword, pageable);
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/count-by-partner")
+    public ResponseEntity<Long> countByPartner() {
+        long count = productService.countProductsByPartner();
+        return ResponseEntity.ok(count);
+    }
+
+    @GetMapping("/total-views-by-brand")
+    public ResponseEntity<Long> getTotalViewsByBrand() {
+        long totalViews = productService.getTotalViewCountByBrand();
+        return ResponseEntity.ok(totalViews);
+    }
 }

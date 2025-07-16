@@ -81,4 +81,16 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getReviewStatsByAccount());
     }
 
+    @GetMapping("/average-rating-by-brand")
+    public ResponseEntity<Double> averageRatingByBrand() {
+        double avg = reviewService.getAverageRatingByBrand();
+        return ResponseEntity.ok(avg);
+    }
+
+    @GetMapping("/total-by-brand")
+    public ResponseEntity<Long> getTotalReviewsByBrand() {
+        long total = reviewService.getTotalReviewsByBrand();
+        return ResponseEntity.ok(total);
+    }
+
 }

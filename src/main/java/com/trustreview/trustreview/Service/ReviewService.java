@@ -253,4 +253,15 @@ public class ReviewService {
     }
 
 
+    public double getAverageRatingByBrand() {
+        Partner partner = (Partner) accountUtils.getAccountCurrent();
+        Double avg = reviewRepository.averageRatingByBrandName(partner.getCompanyName());
+        return avg != null ? avg : 0.0;
+    }
+
+    public long getTotalReviewsByBrand() {
+        Partner partner = (Partner) accountUtils.getAccountCurrent();
+        Long count = reviewRepository.countTotalReviewsByBrand(partner.getCompanyName());
+        return count != null ? count : 0L;
+    }
 }

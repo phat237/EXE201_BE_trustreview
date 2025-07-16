@@ -32,6 +32,8 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private ProductCategory category;
 
+    private Long viewCount = 0L;
+
     @OneToMany(mappedBy = "productReview", cascade = CascadeType.ALL)
     @JsonIgnore
     Set<Review> reviews;
