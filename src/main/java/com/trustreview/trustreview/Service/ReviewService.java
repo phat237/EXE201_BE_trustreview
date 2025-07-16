@@ -238,14 +238,19 @@ public class ReviewService {
         return new AverageRatingResponse(finalAvg, count);
     }
 
-
     public ReviewStatsResponse getReviewStatsByAccount() {
         Long accountId = accountUtils.getAccountCurrent().getId();
+
         long total = reviewRepository.countByAccountId(accountId);
-        long helpful = Optional.ofNullable(reviewRepository.sumHelpfulCountByAccountId(accountId)).orElse(0L);
-        double avg = Optional.ofNullable(reviewRepository.averageRatingByAccountId(accountId)).orElse(0.0);
+        Long helpful = reviewRepository.sumHelpfulCountByAccountId(accountId);
+        Double avg = reviewRepository.averageRatingByAccountId(accountId);
         long verified = reviewRepository.countVerifiedByAccountId(accountId);
+
+//        long helpful = (helpfulRaw != null) ? helpfulRaw : 0L;
+//        double avg = (avgRaw != null) ? avgRaw : 0.0;
+
         return new ReviewStatsResponse(total, helpful, avg, verified);
     }
+
 
 }

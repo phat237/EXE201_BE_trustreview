@@ -56,5 +56,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategoryExcept(@Param("productId") Long productId,
                                        @Param("category") ProductCategory category);
 
-
+    Page<Product> findByNameContainingIgnoreCase(String keyword, Pageable pageable);
 }

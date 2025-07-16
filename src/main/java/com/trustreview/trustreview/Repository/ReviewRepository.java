@@ -46,10 +46,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT COUNT(r) FROM Review r WHERE r.userReview.id = :accountId")
     long countByAccountId(@Param("accountId") Long accountId);
 
-    @Query("SELECT COUNT(rf) FROM ReviewFeedback rf WHERE rf.reviewFeedback.userReview.id = :accountId AND rf.isHelpful = true")
+    @Query("SELECT COUNT(rf) FROM ReviewFeedback rf WHERE rf.userFeedback.id = :accountId AND rf.isHelpful = true")
     Long sumHelpfulCountByAccountId(@Param("accountId") Long accountId);
 
-    @Query("SELECT AVG(r.rating) FROM Review r WHERE r.userReview.id = :accountId")
+    @Query("SELECT ROUND(AVG(r.rating), 1) FROM Review r WHERE r.userReview.id = :accountId")
     Double averageRatingByAccountId(@Param("accountId") Long accountId);
 
     @Query("SELECT COUNT(r) FROM Review r WHERE r.userReview.id = :accountId AND r.isVerifiedByAI = true")

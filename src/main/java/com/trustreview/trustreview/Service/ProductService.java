@@ -109,5 +109,7 @@ public class ProductService {
         return new PageImpl<>(pageContent, pageable, result.size());
     }
 
-
+    public Page<Product> searchProductsPaged(String keyword, Pageable pageable) {
+        return productRepository.findByNameContainingIgnoreCase(keyword, pageable);
+    }
 }

@@ -74,5 +74,13 @@ public class ProductController {
         return ResponseEntity.ok(productService.getRelatedProducts(productId, pageable));
     }
 
-
+    @GetMapping("/search/paging")
+    public ResponseEntity<Page<Product>> searchProductsPaged(
+            @RequestParam("keyword") String keyword,
+            @RequestParam int page,
+            @RequestParam int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> result = productService.searchProductsPaged(keyword, pageable);
+        return ResponseEntity.ok(result);
+    }
 }
