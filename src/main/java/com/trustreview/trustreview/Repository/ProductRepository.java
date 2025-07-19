@@ -64,4 +64,20 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT SUM(p.viewCount) FROM Product p WHERE p.brandName = :brandName")
     Long getTotalViewCountByBrand(@Param("brandName") String brandName);
 
+    @Query("""
+    SELECT p
+    FROM Product p
+    JOIN p.reviews r
+    WHERE p.brandName = :brandName
+    GROUP BY p
+    HAVING AVG(r.rating) >= :minRating AND AVG(r.rating) < (:minRating + 1)
+    ORDER BY AVG(r.rating) DESC, COUNT(r) DESC
+""")
+    Page<Product> findByBrandNameAndRatingRange(
+            @Param("brandName") String brandName,
+            @Param("minRating") int minRating,
+            Pageable pageable);
+
+    Page<Product> findByCategory(ProductCategory category, Pageable pageable);
+
 }

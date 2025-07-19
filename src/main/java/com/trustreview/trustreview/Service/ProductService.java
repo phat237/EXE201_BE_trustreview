@@ -138,4 +138,16 @@ public class ProductService {
         Long total = productRepository.getTotalViewCountByBrand(partner.getCompanyName());
         return total;
     }
+
+    public Page<Product> getProductsByBrandAndRating(int star, Pageable pageable) {
+        if (star < 1 || star > 5) {
+            throw new IllegalArgumentException("Số sao phải nằm trong khoảng từ 1 tới 5!");
+        }
+        Partner partner = (Partner) accountUtils.getAccountCurrent();
+        return productRepository.findByBrandNameAndRatingRange(partner.getCompanyName(), star, pageable);
+    }
+
+    public Page<Product> getProductsByCategory(ProductCategory category, Pageable pageable) {
+        return productRepository.findByCategory(category, pageable);
+    }
 }

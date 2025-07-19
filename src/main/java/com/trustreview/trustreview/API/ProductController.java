@@ -95,4 +95,26 @@ public class ProductController {
         long totalViews = productService.getTotalViewCountByBrand();
         return ResponseEntity.ok(totalViews);
     }
+
+    @GetMapping("/by-brand-rating")
+    public ResponseEntity<Page<Product>> getProductsByBrandAndRating(
+            @RequestParam int rating,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> result = productService.getProductsByBrandAndRating(rating, pageable);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/search-by-category")
+    public ResponseEntity<Page<Product>> getProductsByCategory(
+            @RequestParam ProductCategory category,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> result = productService.getProductsByCategory(category, pageable);
+        return ResponseEntity.ok(result);
+    }
 }

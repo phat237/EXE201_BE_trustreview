@@ -78,6 +78,10 @@ public class AuthenticationService implements UserDetailsService {
                 throw new AuthenticationServiceException("Tài khoản bạn đã bị khóa!");
             }
 
+            if(account.getStatus().equals(AccountStatus.PENDING)){
+                throw new AuthenticationServiceException("Tài khoản đang chờ xác thực!");
+            }
+
             String token = tokenService.generateToken(account);
 
             if (account.getRole().equals(AccountRoles.USER) || account.getRole().equals(AccountRoles.ADMIN)){
@@ -182,7 +186,7 @@ public class AuthenticationService implements UserDetailsService {
         partner.setWebsite(registerPartnerRequest.getWebsite());
         partner.setMoney(0.0);
         partner.setRole(AccountRoles.PARTNER);
-        partner.setStatus(AccountStatus.ACTIVE);
+        partner.setStatus(AccountStatus.PENDING);
         partner.setCreatedAt(LocalDateTime.now());
         return authenticationRepository.save(partner);
     }
