@@ -9,10 +9,7 @@ import com.trustreview.trustreview.Repository.PartnerRepository;
 import com.trustreview.trustreview.Repository.ProductRepository;
 import com.trustreview.trustreview.Utils.AccountUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
@@ -147,7 +144,8 @@ public class ProductService {
         return productRepository.findByBrandNameAndRatingRange(partner.getCompanyName(), star, pageable);
     }
 
-    public Page<Product> getProductsByCategory(ProductCategory category, Pageable pageable) {
+    public Page<Product> getProductsByCategory(ProductCategory category, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         return productRepository.findByCategory(category, pageable);
     }
 }

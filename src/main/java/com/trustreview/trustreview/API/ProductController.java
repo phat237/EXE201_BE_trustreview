@@ -114,7 +114,7 @@ public class ProductController {
             @RequestParam int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Product> result = productService.getProductsByCategory(category, pageable);
+        Page<Product> result = productService.getProductsByCategory(category, page, size);
         return ResponseEntity.ok(result);
     }
 }
