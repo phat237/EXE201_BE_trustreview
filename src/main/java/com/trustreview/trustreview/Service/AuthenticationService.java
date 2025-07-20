@@ -186,7 +186,7 @@ public class AuthenticationService implements UserDetailsService {
         partner.setWebsite(registerPartnerRequest.getWebsite());
         partner.setMoney(0.0);
         partner.setRole(AccountRoles.PARTNER);
-        partner.setStatus(AccountStatus.PENDING);
+        partner.setStatus(AccountStatus.ACTIVE);
         partner.setCreatedAt(LocalDateTime.now());
         return authenticationRepository.save(partner);
     }
