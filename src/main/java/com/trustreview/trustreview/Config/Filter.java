@@ -41,6 +41,8 @@ public class Filter extends OncePerRequestFilter {
             "/products/sorted-by-rating",
             "/products/{productId}/related",
             "/premium-packages",
+            "/transactions/success/**",
+            "/transactions/fail/**",
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/swagger-resources/**"

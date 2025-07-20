@@ -55,6 +55,8 @@ public class SecurityConfig {
                                         "/premium-packages",
                                         "/products/sorted-by-rating",
                                         "/products/{productId}/related",
+                                        "/transactions/success/**",
+                                        "/transactions/fail/**",
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**",
                                         "/swagger-ui.html"
