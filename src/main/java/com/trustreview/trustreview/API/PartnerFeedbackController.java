@@ -42,4 +42,10 @@ public class PartnerFeedbackController {
         partnerFeedbackService.delete(id);
         return ResponseEntity.ok("Đã xóa phản hồi thành công.");
     }
+
+    @GetMapping("/can-feedback")
+    public ResponseEntity<Boolean> canPartnerFeedback(@RequestParam Long reviewId) {
+        boolean result = partnerFeedbackService.isReviewEligibleForFeedback(reviewId);
+        return ResponseEntity.ok(result);
+    }
 }

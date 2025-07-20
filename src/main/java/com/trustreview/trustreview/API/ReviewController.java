@@ -93,4 +93,9 @@ public class ReviewController {
         return ResponseEntity.ok(total);
     }
 
+    @GetMapping("/liked/{reviewId}")
+    public ResponseEntity<Boolean> isLikedByCurrentUser(@PathVariable Long reviewId) {
+        boolean liked = reviewService.isUserLikedReview(reviewId);
+        return ResponseEntity.ok(liked);
+    }
 }

@@ -36,6 +36,10 @@ public class PartnerFeedbackService {
             throw new BadCredentialsException("Đánh giá không tồn tại");
         }
 
+        if (!partner.getCompanyName().equalsIgnoreCase(review.getProductReview().getBrandName())){
+            throw new BadCredentialsException("Brand của bạn không được phản sản phẩm này!");
+        }
+
         if (partnerFeedbackRepository.findByReviewPartnerFeedback(review) != null) {
             throw new BadCredentialsException("Đánh giá này đã được phản hồi");
         }
@@ -78,4 +82,18 @@ public class PartnerFeedbackService {
         }
         partnerFeedbackRepository.deleteById(id);
     }
+
+    public boolean isReviewEligibleForFeedback(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId).orElse(null);
+        Partner partner = (Partner) accountUtils.getAccountCurrent();
+
+        if (review == null || partner == null) return false;
+
+        boolean matchBrand = review.getProductReview().getBrandName().equalsIgnoreCase(partner.getCompanyName());
+
+        boolean notYetReplied = review.getPartnerFeedback() == null;
+
+        return matchBrand && notYetReplied;
+    }
+
 }

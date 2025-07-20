@@ -264,4 +264,9 @@ public class ReviewService {
         Long count = reviewRepository.countTotalReviewsByBrand(partner.getCompanyName());
         return count != null ? count : 0L;
     }
+
+    public boolean isUserLikedReview(Long reviewId) {
+        Long userId = accountUtils.getAccountCurrent().getId();
+        return reviewFeedbackRepository.existsByUserFeedback_IdAndReviewFeedback_IdAndIsHelpfulTrue(userId, reviewId);
+    }
 }
