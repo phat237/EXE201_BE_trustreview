@@ -48,8 +48,8 @@ public class PayOSService {
                 .orderCode(orderCode)
                 .amount(premiumPackage.getPrice().intValue())
                 .description(premiumPackage.getName())
-                .returnUrl("http://localhost:5173/checkout/success?orderCode=" + orderCode + "&partnerId=" + partner.getId() + "&packageId=" + packageId)
-                .cancelUrl("http://localhost:5173/checkout/fail")
+                .returnUrl("https://trustreview.vercel.app/checkout/success?orderCode=" + orderCode + "&partnerId=" + partner.getId() + "&packageId=" + packageId)
+                .cancelUrl("https://trustreview.vercel.app/fail")
                 .item(itemData)
                 .build();
         return payOS.createPaymentLink(paymentData);
