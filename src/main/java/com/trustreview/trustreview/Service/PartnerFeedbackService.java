@@ -96,4 +96,7 @@ public class PartnerFeedbackService {
         return matchBrand && notYetReplied;
     }
 
+    public List<PartnerFeedback> getByReviewId(Long reviewId) {
+        return partnerFeedbackRepository.findByReviewPartnerFeedback_Id(reviewId);
+    }
 }

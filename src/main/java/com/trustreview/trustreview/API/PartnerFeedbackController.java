@@ -32,6 +32,12 @@ public class PartnerFeedbackController {
         return ResponseEntity.ok(partnerFeedbackService.getById(id));
     }
 
+    @GetMapping("/review/{reviewId}")
+    public ResponseEntity<List<PartnerFeedback>> getByReviewId(@PathVariable Long reviewId) {
+        List<PartnerFeedback> feedback = partnerFeedbackService.getByReviewId(reviewId);
+        return ResponseEntity.ok(feedback);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<PartnerFeedback> update(@PathVariable Long id, @RequestBody String newContent) {
         return ResponseEntity.ok(partnerFeedbackService.update(id, newContent));
