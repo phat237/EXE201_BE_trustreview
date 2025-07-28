@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin
@@ -116,5 +117,29 @@ public class ProductController {
         Pageable pageable = PageRequest.of(page, size);
         Page<Product> result = productService.getProductsByCategory(category, page, size);
         return ResponseEntity.ok(result);
+    }
+
+//    @GetMapping("/dashboard")
+//    public ResponseEntity<Map<String, Object>> getProductDashboard() {
+//        return ResponseEntity.ok(productService.getProductDashboard());
+//    }
+    @GetMapping("/admin/dashboard/summary")
+    public ResponseEntity<Map<String, Object>> getProductSummary() {
+        return ResponseEntity.ok(productService.getProductSummary());
+    }
+
+    @GetMapping("/admin/dashboard/view-stats")
+    public ResponseEntity<Map<String, Object>> getViewStats() {
+        return ResponseEntity.ok(productService.getViewStats());
+    }
+
+    @GetMapping("/admin/dashboard/new-product-growth")
+    public ResponseEntity<Map<String, Object>> getNewProductGrowth() {
+        return ResponseEntity.ok(productService.getNewProductGrowth());
+    }
+
+    @GetMapping("/admin/dashboard/avg-rating")
+    public ResponseEntity<Map<String, Double>> getAvgRatingByCategory() {
+        return ResponseEntity.ok(productService.getAvgRatingByCategory());
     }
 }

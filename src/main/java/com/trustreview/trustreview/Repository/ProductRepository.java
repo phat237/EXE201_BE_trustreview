@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -80,4 +81,18 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findByCategory(ProductCategory category, Pageable pageable);
 
+    //
+    long countByCategory(ProductCategory category);
+
+    @Query("SELECT SUM(p.viewCount) FROM Product p")
+    Long sumViewCount();
+
+    @Query("SELECT p FROM Product p ORDER BY p.viewCount DESC")
+    Page<Product> findTopByViewCount(Pageable pageable);
+
+    @Query("SELECT COUNT(p) FROM Product p WHERE p.createdAt BETWEEN :start AND :end")
+    long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+
+    @Query("SELECT p.category, AVG(r.rating) FROM Product p LEFT JOIN p.reviews r GROUP BY p.category")
+    List<Object[]> findAverageRatingByCategory();
 }

@@ -14,8 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -147,5 +152,95 @@ public class ProductService {
     public Page<Product> getProductsByCategory(ProductCategory category, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         return productRepository.findByCategory(category, pageable);
+    }
+
+
+//    public Map<String, Object> getProductDashboard() {
+//        Map<String, Object> dashboard = new HashMap<>();
+//
+//        // Tổng số sản phẩm
+//        dashboard.put("totalProducts", productRepository.count());
+//
+//        // Số sản phẩm theo danh mục
+//        Map<String, Long> categoryCounts = new HashMap<>();
+//        for (ProductCategory category : ProductCategory.values()) {
+//            categoryCounts.put(category.name(), productRepository.countByCategory(category));
+//        }
+//        dashboard.put("categoryCounts", categoryCounts);
+//
+//        // Tổng lượt xem
+//        dashboard.put("totalViewCount", productRepository.sumViewCount() != null ? productRepository.sumViewCount() : 0L);
+//
+//        // Top 5 sản phẩm xem nhiều
+//        Pageable topFive = PageRequest.of(0, 5);
+//        dashboard.put("topViewProducts", productRepository.findTopByViewCount(topFive).getContent());
+//
+//        // Tăng trưởng sản phẩm mới
+//        LocalDateTime now = LocalDateTime.now();
+//        LocalDateTime startCurrentWeek = now.with(LocalTime.MIN).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+//        LocalDateTime endCurrentWeek = now.with(LocalTime.MAX).with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+//        LocalDateTime startPreviousWeek = startCurrentWeek.minusWeeks(1);
+//        LocalDateTime endPreviousWeek = endCurrentWeek.minusWeeks(1);
+//        long currentWeekCount = productRepository.countByCreatedAtBetween(startCurrentWeek, endCurrentWeek);
+//        long previousWeekCount = productRepository.countByCreatedAtBetween(startPreviousWeek, endPreviousWeek);
+//        double growthPercentage = previousWeekCount > 0 ? ((double) (currentWeekCount - previousWeekCount) / previousWeekCount) * 100 : (currentWeekCount > 0 ? 100.0 : 0.0);
+//        dashboard.put("newProductGrowth", Map.of(
+//                "currentWeekCount", currentWeekCount,
+//                "previousWeekCount", previousWeekCount,
+//                "growthPercentage", growthPercentage
+//        ));
+//
+//        // Đánh giá trung bình theo danh mục
+//        Map<String, Double> avgRatings = new HashMap<>();
+//        for (Object[] result : productRepository.findAverageRatingByCategory()) {
+//            avgRatings.put(((ProductCategory) result[0]).name(), (Double) result[1]);
+//        }
+//        dashboard.put("avgRatingByCategory", avgRatings);
+//
+//        return dashboard;
+//    }
+
+    public Map<String, Object> getProductSummary() {
+        Map<String, Object> summary = new HashMap<>();
+        summary.put("totalProducts", productRepository.count());
+        Map<String, Long> categoryCounts = new HashMap<>();
+        for (ProductCategory category : ProductCategory.values()) {
+            categoryCounts.put(category.name(), productRepository.countByCategory(category));
+        }
+        summary.put("categoryCounts", categoryCounts);
+        return summary;
+    }
+
+    public Map<String, Object> getViewStats() {
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalViewCount", productRepository.sumViewCount() != null ? productRepository.sumViewCount() : 0L);
+        Pageable topFive = PageRequest.of(0, 5);
+        stats.put("topViewProducts", productRepository.findTopByViewCount(topFive).getContent());
+        return stats;
+    }
+
+    public Map<String, Object> getNewProductGrowth() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startCurrentWeek = now.with(LocalTime.MIN).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDateTime endCurrentWeek = now.with(LocalTime.MAX).with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        LocalDateTime startPreviousWeek = startCurrentWeek.minusWeeks(1);
+        LocalDateTime endPreviousWeek = endCurrentWeek.minusWeeks(1);
+        long currentWeekCount = productRepository.countByCreatedAtBetween(startCurrentWeek, endCurrentWeek);
+        long previousWeekCount = productRepository.countByCreatedAtBetween(startPreviousWeek, endPreviousWeek);
+        double growthPercentage = previousWeekCount > 0 ? ((double) (currentWeekCount - previousWeekCount) / previousWeekCount) * 100 : (currentWeekCount > 0 ? 100.0 : 0.0);
+        return Map.of(
+                "currentWeekCount", currentWeekCount,
+                "previousWeekCount", previousWeekCount,
+                "growthPercentage", Double.parseDouble(String.format("%.1f", growthPercentage))
+        );
+    }
+
+    public Map<String, Double> getAvgRatingByCategory() {
+        Map<String, Double> avgRatings = new HashMap<>();
+        for (Object[] result : productRepository.findAverageRatingByCategory()) {
+            Double avgRating = result[1] != null ? ((Number) result[1]).doubleValue() : 0.0;
+            avgRatings.put(((ProductCategory) result[0]).name(), Double.parseDouble(String.format("%.2f", avgRating)));
+        }
+        return avgRatings;
     }
 }
