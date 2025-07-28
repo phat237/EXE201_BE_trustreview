@@ -99,4 +99,19 @@ public class ReviewController {
         boolean liked = reviewService.isUserLikedReview(reviewId);
         return ResponseEntity.ok(liked);
     }
+
+    @GetMapping("/admin/dashboard/summary")
+    public ResponseEntity<Map<String, Object>> getReviewSummary() {
+        return ResponseEntity.ok(reviewService.getReviewSummary());
+    }
+
+    @GetMapping("/admin/dashboard/verification-stats")
+    public ResponseEntity<Map<String, Long>> getReviewVerificationStats() {
+        return ResponseEntity.ok(reviewService.getReviewVerificationStats());
+    }
+
+    @GetMapping("/admin/dashboard/new-review-growth")
+    public ResponseEntity<Map<String, Object>> getNewReviewGrowth() {
+        return ResponseEntity.ok(reviewService.getNewReviewGrowth());
+    }
 }

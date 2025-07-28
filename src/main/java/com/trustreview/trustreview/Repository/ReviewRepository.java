@@ -61,4 +61,18 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT COUNT(r) FROM Review r WHERE r.productReview.brandName = :brandName")
     Long countTotalReviewsByBrand(@Param("brandName") String brandName);
 
+    @Query("SELECT COUNT(r) FROM Review r JOIN r.aiAnalysisLog a WHERE a.isSpam = false")
+    long countValidReviews();
+
+    @Query("SELECT r.rating, COUNT(r) FROM Review r JOIN r.aiAnalysisLog a WHERE a.isSpam = false GROUP BY r.rating")
+    List<Object[]> countByRating();
+
+    @Query("SELECT COUNT(r) FROM Review r WHERE r.isVerifiedByAI = true")
+    long countVerifiedByAI();
+
+    @Query("SELECT COUNT(r) FROM Review r JOIN r.aiAnalysisLog a WHERE a.isSpam = true")
+    long countSpamReviews();
+
+    @Query("SELECT COUNT(r) FROM Review r JOIN r.aiAnalysisLog a WHERE a.isSpam = false AND r.createdAt BETWEEN :start AND :end")
+    long countValidReviewsBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }

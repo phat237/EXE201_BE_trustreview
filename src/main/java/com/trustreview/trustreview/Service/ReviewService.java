@@ -15,9 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
+import java.time.temporal.TemporalAdjusters;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -268,5 +268,39 @@ public class ReviewService {
     public boolean isUserLikedReview(Long reviewId) {
         Long userId = accountUtils.getAccountCurrent().getId();
         return reviewFeedbackRepository.existsByUserFeedback_IdAndReviewFeedback_IdAndIsHelpfulTrue(userId, reviewId);
+    }
+
+    public Map<String, Object> getReviewSummary() {
+        Map<String, Object> summary = new HashMap<>();
+        summary.put("totalReviews", reviewRepository.countValidReviews());
+        Map<Integer, Long> ratingDistribution = new HashMap<>();
+        for (Object[] result : reviewRepository.countByRating()) {
+            ratingDistribution.put((Integer) result[0], (Long) result[1]);
+        }
+        summary.put("ratingDistribution", ratingDistribution);
+        return summary;
+    }
+
+    public Map<String, Long> getReviewVerificationStats() {
+        return Map.of(
+                "verifiedByAI", reviewRepository.countVerifiedByAI(),
+                "spamReviews", reviewRepository.countSpamReviews()
+        );
+    }
+
+    public Map<String, Object> getNewReviewGrowth() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startCurrentWeek = now.with(LocalTime.MIN).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDateTime endCurrentWeek = now.with(LocalTime.MAX).with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        LocalDateTime startPreviousWeek = startCurrentWeek.minusWeeks(1);
+        LocalDateTime endPreviousWeek = endCurrentWeek.minusWeeks(1);
+        long currentWeekCount = reviewRepository.countValidReviewsBetween(startCurrentWeek, endCurrentWeek);
+        long previousWeekCount = reviewRepository.countValidReviewsBetween(startPreviousWeek, endPreviousWeek);
+        double growthPercentage = previousWeekCount > 0 ? ((double) (currentWeekCount - previousWeekCount) / previousWeekCount) * 100 : (currentWeekCount > 0 ? 100.0 : 0.0);
+        return Map.of(
+                "currentWeekCount", currentWeekCount,
+                "previousWeekCount", previousWeekCount,
+                "growthPercentage", Double.parseDouble(String.format("%.1f", growthPercentage))
+        );
     }
 }
