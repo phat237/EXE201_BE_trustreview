@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.payos.type.CheckoutResponseData;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/transactions")
 @RequiredArgsConstructor
@@ -44,5 +47,20 @@ public class TransactionController {
     public ResponseEntity<?> markFail(@PathVariable Long orderCode) {
         transactionService.markFailed(orderCode);
         return ResponseEntity.ok("Fail updated");
+    }
+
+    @GetMapping("/admin/dashboard/summary")
+    public ResponseEntity<Map<String, Object>> getTransactionSummary() {
+        return ResponseEntity.ok(transactionService.getTransactionSummary());
+    }
+
+    @GetMapping("/admin/dashboard/revenue-growth")
+    public ResponseEntity<Map<String, Object>> getTransactionRevenueAndGrowth() {
+        return ResponseEntity.ok(transactionService.getTransactionRevenueAndGrowth());
+    }
+
+    @GetMapping("/admin/dashboard/top-partners")
+    public ResponseEntity<List<Map<String, Object>>> getTopPartners() {
+        return ResponseEntity.ok(transactionService.getTopPartners());
     }
 }
