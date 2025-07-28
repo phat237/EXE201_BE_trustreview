@@ -9,10 +9,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
@@ -27,6 +29,8 @@ public class Filter extends OncePerRequestFilter {
     @Autowired
     TokenService tokenService;
 
+    @Autowired
+    SessionRegistry sessionRegistry; // Thêm dependency
 
     @Autowired
     @Qualifier("handlerExceptionResolver")
@@ -79,6 +83,8 @@ public class Filter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(account, token, account.getAuthorities());
                 authenToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenToken);
+                HttpSession session = request.getSession(true); // Tạo session
+//                sessionRegistry.registerNewSession(session.getId(), account); // Đăng ký session
             }
             filterChain.doFilter(request, response); // cho phép truy cập vô controller
         } else {
@@ -107,6 +113,8 @@ public class Filter extends OncePerRequestFilter {
             authenToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenToken);
             // token ok, cho vao`
+            HttpSession session = request.getSession(true); // Tạo session
+//            sessionRegistry.registerNewSession(session.getId(), account); // Đăng ký session
             filterChain.doFilter(request, response);
         }
     }

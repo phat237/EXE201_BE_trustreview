@@ -18,12 +18,20 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 //@Transactional
@@ -49,6 +57,9 @@ public class AuthenticationService implements UserDetailsService {
 
     @Autowired
     AccountUtils accountUtils;
+
+    @Autowired
+    private SessionRegistry sessionRegistry;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -189,5 +200,51 @@ public class AuthenticationService implements UserDetailsService {
         partner.setStatus(AccountStatus.ACTIVE);
         partner.setCreatedAt(LocalDateTime.now());
         return authenticationRepository.save(partner);
+    }
+
+    public Map<String, Long> getAccountCounts() {
+        Map<String, Long> counts = new HashMap<>();
+        counts.put("userCount", authenticationRepository.countByRole(AccountRoles.USER));
+        counts.put("partnerCount", authenticationRepository.countByRole(AccountRoles.PARTNER));
+        return counts;
+    }
+
+    public Map<String, Object> getRegistrationGrowth() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startCurrentWeek = now.with(LocalTime.MIN).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDateTime endCurrentWeek = now.with(LocalTime.MAX).with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        LocalDateTime startPreviousWeek = startCurrentWeek.minusWeeks(1);
+        LocalDateTime endPreviousWeek = endCurrentWeek.minusWeeks(1);
+
+        long currentUser = authenticationRepository.countByRoleAndCreatedAtBetween(AccountRoles.USER, startCurrentWeek, endCurrentWeek);
+        long currentPartner = authenticationRepository.countByRoleAndCreatedAtBetween(AccountRoles.PARTNER, startCurrentWeek, endCurrentWeek);
+        long previousUser = authenticationRepository.countByRoleAndCreatedAtBetween(AccountRoles.USER, startPreviousWeek, endPreviousWeek);
+        long previousPartner = authenticationRepository.countByRoleAndCreatedAtBetween(AccountRoles.PARTNER, startPreviousWeek, endPreviousWeek);
+
+        double userGrowth = previousUser > 0 ? ((double) (currentUser - previousUser) / previousUser) * 100 : (currentUser > 0 ? 100.0 : 0.0);
+        double partnerGrowth = previousPartner > 0 ? ((double) (currentPartner - previousPartner) / previousPartner) * 100 : (currentPartner > 0 ? 100.0 : 0.0);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("currentWeekUserCount", currentUser);
+        result.put("currentWeekPartnerCount", currentPartner);
+        result.put("previousWeekUserCount", previousUser);
+        result.put("previousWeekPartnerCount", previousPartner);
+        result.put("userGrowthPercentage", Math.round(userGrowth * 10.0) / 10.0);
+        result.put("partnerGrowthPercentage", Math.round(partnerGrowth * 10.0) / 10.0);
+        return result;
+    }
+
+    public Map<String, Long> getOnlineUsersCount() {
+        List<Object> principals = sessionRegistry.getAllPrincipals();
+        long onlineUser = principals.stream()
+                .filter(p -> p instanceof Account && ((Account) p).getRole().equals(AccountRoles.USER))
+                .count();
+        long onlinePartner = principals.stream()
+                .filter(p -> p instanceof Account && ((Account) p).getRole().equals(AccountRoles.PARTNER))
+                .count();
+        Map<String, Long> counts = new HashMap<>();
+        counts.put("onlineUserCount", onlineUser);
+        counts.put("onlinePartnerCount", onlinePartner);
+        return counts;
     }
 }

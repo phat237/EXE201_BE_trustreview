@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @CrossOrigin
 @RequestMapping("/accounts")
@@ -61,6 +63,21 @@ public class AuthenticationController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteAccountById(@PathVariable("id") long id){
         return ResponseEntity.ok(authenticationService.deleteAccountById(id));
+    }
+
+    @GetMapping("/account-counts")
+    public Map<String, Long> getAccountCounts() {
+        return authenticationService.getAccountCounts();
+    }
+
+    @GetMapping("/registration-growth")
+    public Map<String, Object> getRegistrationGrowth() {
+        return authenticationService.getRegistrationGrowth();
+    }
+
+    @GetMapping("/online-users")
+    public Map<String, Long> getOnlineUsersCount() {
+        return authenticationService.getOnlineUsersCount();
     }
 }
 
